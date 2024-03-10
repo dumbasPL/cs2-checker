@@ -1,0 +1,25 @@
+{
+  "name": "cs2-checker",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "eslint --ext .ts ."
+  },
+  "dependencies": {
+    "protobufjs": "^7.2.6",
+    "steam-session": "^1.7.2",
+    "steam-user": "^5.0.8"
+  },
+  "devDependencies": {
+    "@types/steam-user": "^4.26.8",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.29.1",
+    "typescript": "^5.4.2"
+  }
+}

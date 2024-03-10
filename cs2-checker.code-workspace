@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {
+      "path": "app"
+    },
+    {
+      "path": "checker"
+    },
+    {
+      "path": "server"
+    },
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "app/": true,
+      "checker/": true,
+      "server/": true
+    }
+  }
+}

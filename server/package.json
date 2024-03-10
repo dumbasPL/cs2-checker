@@ -1,0 +1,33 @@
+{
+  "name": "cs2-checker-server",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "dist/src/server.js",
+  "types": "dist/src/server.d.ts",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "eslint --ext .ts ."
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.2",
+    "@trpc/server": "^10.45.1",
+    "cs2-checker": "../checker/",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.25",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.29.1",
+    "nodemon": "^3.1.0",
+    "prisma": "^5.10.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  }
+}
