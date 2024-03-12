@@ -1,5 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
+import { VueQueryPlugin } from "vue-query";
+
 import './app.css';
 
-createApp(App).mount('#app');
+createApp(App).use(VueQueryPlugin).mount('#app');

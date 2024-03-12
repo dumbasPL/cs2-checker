@@ -11,6 +11,7 @@ export default defineConfig((env) => {
       rollupOptions: {
         external,
         // Preload scripts may contain Web assets, so use the `build.rollupOptions.input` instead `build.lib.entry`.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         input: forgeConfigSelf.entry!,
         output: {
           format: 'cjs',

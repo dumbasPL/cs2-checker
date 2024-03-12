@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 export const appRouter = router({
   tagList: publicProcedure
+    .input(z.object({}))
     .query(async () => {
       const tags = await prisma.tag.findMany();
       return tags;

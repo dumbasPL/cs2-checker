@@ -10,6 +10,7 @@ export default defineConfig((env) => {
   const config: UserConfig = {
     build: {
       lib: {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         entry: forgeConfigSelf.entry!,
         fileName: () => '[name].js',
         formats: ['cjs'],

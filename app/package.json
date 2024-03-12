@@ -15,8 +15,14 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/vue-fontawesome": "^3.0.6",
+    "@trpc/client": "^10.45.2",
+    "@trpc/server": "^10.45.2",
     "electron-squirrel-startup": "^1.0.0",
-    "vue": "^3.4.21"
+    "vue": "^3.4.21",
+    "vue-query": "^1.26.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.3.0",
