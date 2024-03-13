@@ -20,7 +20,9 @@
     "@fortawesome/vue-fontawesome": "^3.0.6",
     "@trpc/client": "^10.45.2",
     "@trpc/server": "^10.45.2",
+    "cs2-checker-server": "../server",
     "electron-squirrel-startup": "^1.0.0",
+    "electron-trpc": "^0.5.2",
     "vue": "^3.4.21",
     "vue-query": "^1.26.0"
   },
