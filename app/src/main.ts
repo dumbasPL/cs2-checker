@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron';
 import path from 'path';
 // eslint-disable-next-line import/no-unresolved
 import { createIPCHandler } from "electron-trpc/main";
-import { appRouter } from "cs2-checker-server";
+import { initDb, appRouter } from "cs2-checker-server";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -31,7 +31,12 @@ const createWindow = () => {
   // mainWindow.webContents.openDevTools();
 };
 
-app.on('ready', createWindow);
+app.on('ready', async () => {
+  const dbPath = process.env.DB_PATH || path.join(app.getPath('userData'), 'cs2-checker.db');
+  console.log('dbPath', dbPath);
+  await initDb(dbPath);
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

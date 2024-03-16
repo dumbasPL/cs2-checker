@@ -1,26 +1,29 @@
-import prisma from './prisma';
 import { publicProcedure, router } from './trpc';
 import { z } from 'zod';
+import { setupDb, migrateDb, db, Tag } from './db';
+
+export async function initDb(filename: string) {
+  setupDb(filename);
+  await migrateDb();
+}
 
 export const appRouter = router({
   tagList: publicProcedure
     .input(z.object({}))
     .query(async () => {
-      const tags = await prisma.tag.findMany();
-      return tags;
+      return await db<Tag>('Tag').select('*');
     }),
   tagCreate: publicProcedure
-    .input(z.object({name: z.string(), color: z.string().regex(/^#[0-9A-Fa-f]{6}$/)}))
+    .input(z.object({name: z.string()}))
     .mutation(async opts => {
-      const tag = await prisma.tag.create({data: opts.input});
-      return tag;
+      return await db<Tag>('Tag').insert({name: opts.input.name});
     }),
   tagDelete: publicProcedure
     .input(z.object({id: z.number()}))
     .mutation(async opts => {
-      await prisma.tag.delete({where: {id: opts.input.id}});
+      await db<Tag>('Tag').where('id', opts.input.id).delete();
       return null;
     }),
 });
- 
+
 export type AppRouter = typeof appRouter;

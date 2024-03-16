@@ -2,19 +2,22 @@
   "name": "cs2-checker-server",
   "version": "1.0.0",
   "license": "MIT",
-  "main": "dist/src/server.js",
-  "types": "dist/src/server.d.ts",
+  "main": "dist/server.js",
+  "types": "dist/server.d.ts",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "dev": "cross-env DB_PATH=../dev.db nodemon --exec ts-node src/index.ts",
     "build": "tsc",
     "watch": "tsc -w",
-    "lint": "eslint --ext .ts ."
+    "lint": "eslint --ext .ts .",
+    "knex": "knex --knexfile ./src/knexfile.ts"
   },
   "dependencies": {
-    "@prisma/client": "^5.10.2",
     "@trpc/server": "^10.45.1",
+    "better-sqlite3": "^9.4.3",
     "cors": "^2.8.5",
     "cs2-checker": "../checker/",
+    "dotenv": "^16.4.5",
+    "knex": "^3.1.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -22,14 +25,11 @@
     "@types/node": "^20.11.25",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
+    "cross-env": "^7.0.3",
     "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.29.1",
     "nodemon": "^3.1.0",
-    "prisma": "^5.10.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.2"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
   }
 }

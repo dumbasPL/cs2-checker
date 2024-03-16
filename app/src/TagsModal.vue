@@ -16,7 +16,7 @@ const {data: tags, refetch, error: queryError} = useQuery('tags', async () => {
   return trpc.tagList.query({});
 });
 
-const {mutate: createTag, isLoading: submitting, error: createError} = useMutation('tagCreate', async (data: {name: string, color: string}) => {
+const {mutate: createTag, isLoading: submitting, error: createError} = useMutation('tagCreate', async (data: {name: string}) => {
   return trpc.tagCreate.mutate(data);
 }, {
   onSuccess: () => {
@@ -45,7 +45,7 @@ const canSubmit = computed(() => {
 });
 
 async function add() {
-  createTag({name: inputName.value, color: '#000000'});
+  createTag({name: inputName.value});
   inputName.value = '';
 }
 
