@@ -13,36 +13,5 @@ checker.run(refreshToken).then((response) => {
   console.dir(response, { depth: null });
 });
 
-
-// import { EAuthTokenPlatformType, LoginSession } from "steam-session";
-// const session = new LoginSession(EAuthTokenPlatformType.SteamClient);
-// session.startWithCredentials({
-//   accountName: '9vecher7',
-//   password: '',
-//   steamGuardCode: '',
-// }).then((response) => {
-//   console.log(response);
-// });
-
-// session.on('steamGuardMachineToken', () => {
-//   console.log(`Received Steam Guard machine token: ${session.steamGuardMachineToken}`);
-// });
-
-// session.on('authenticated', () => {
-//   console.log('\nAuthenticated successfully! Printing your tokens now...');
-//   console.log(`SteamID: ${session.steamID}`);
-//   console.log(`Account name: ${session.accountName}`);
-//   console.log(`Access token: ${session.accessToken}`);
-//   console.log(`Refresh token: ${session.refreshToken}`);
-// });
-
-// session.on('timeout', () => {
-//   console.error('Timed out while logging in');
-// });
-
-// session.on('error', (error) => {
-//   console.error('Error during login:', error);
-// });
-
 // re-export the checker
-export { Checker } from './checker';
+export { Checker, IAccountData } from './checker';

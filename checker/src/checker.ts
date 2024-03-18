@@ -16,6 +16,7 @@ const root = protobuf.loadSync([
 const CMsgClientHello = root.lookupType("CMsgClientHello");
 const CMsgClientWelcome = root.lookupType("CMsgClientWelcome");
 const CSOPersonaDataPublic = root.lookupType("CSOPersonaDataPublic");
+const CSOAccountItemPersonalStore = root.lookupType("CSOAccountItemPersonalStore");
 const CSOEconGameAccountClient = root.lookupType("CSOEconGameAccountClient");
 const CMsgGCCStrike15_v2_MatchmakingGC2ClientHello = root.lookupType("CMsgGCCStrike15_v2_MatchmakingGC2ClientHello");
 const CMsgGCCStrike15_v2_ClientGCRankUpdate = root.lookupType("CMsgGCCStrike15_v2_ClientGCRankUpdate");
@@ -25,7 +26,9 @@ function createGCMessage<T extends protobuf.Type>(type: T, properties?: { [k: st
   return Buffer.from(type.encode(type.create(properties)).finish());
 }
 
-interface IAccountData {
+export interface IAccountData {
+  personaName: string;
+  avatarUrl: string;
   limited: boolean;
   locked: boolean;
   communityBanned: boolean;
@@ -36,6 +39,8 @@ interface IAccountData {
   bonusXpUsedflags: number;
   xpTrailLevel: number;
   xpTrailTimestampRefresh: number | null;
+  redeemableDrops: number;
+  redeemableDropsGenerated: number | null;
   vac: boolean;
   penaltyReason: string | null;
   penaltyExpires: number | null;
@@ -46,10 +51,10 @@ interface IAccountData {
       leaderboardName: string | null;
       leaderboardNameStatus: number;
     },
-    perMapRank: Partial<Record<string, {
+    perMapRank: Record<string, {
       rank: number,
       wins: number,
-    }>>,
+    }>,
     wingman?: {
       rank: number;
       wins: number;
@@ -294,11 +299,11 @@ export declare interface Checker {
 export class Checker extends EventEmitter {
   private data: IAccountData;
   private acquiredData = {
+    persona: false,
     accountLimitations: false,
     clientWelcome: false,
     matchmakingClientHello: false,
-    personaDataPublic: false,
-    gameAccountClient: false,
+    caches: false,
     wingmanRank: false,
     premierRank: false,
     perMapRank: false,
@@ -307,6 +312,8 @@ export class Checker extends EventEmitter {
   constructor() {
     super();
     this.data = {
+      personaName: '',
+      avatarUrl: 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/fe/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg',
       limited: false,
       locked: false,
       communityBanned: false,
@@ -317,6 +324,8 @@ export class Checker extends EventEmitter {
       bonusXpUsedflags: 0,
       xpTrailLevel: 0,
       xpTrailTimestampRefresh: null,
+      redeemableDrops: 0,
+      redeemableDropsGenerated: null,
       vac: false,
       penaltyReason: null,
       penaltyExpires: null,
@@ -347,7 +356,17 @@ export class Checker extends EventEmitter {
           // this.data.level = message.playerLevel ?? 0;
           this.data.xpTrailLevel = message.xpTrailLevel ?? 0;
           this.data.xpTrailTimestampRefresh = message.xpTrailTimestampRefresh ?? null;
-          this.acquiredData.personaDataPublic = true;
+          this.debug('got personaDataPublic: ' + JSON.stringify(message));
+          break;
+        }
+        case SubscribedCacheType.CEconAccountItemPersonalStore: {
+          if (objectData.length != 1) {
+            throw new Error('Expected exactly one CEconAccountItemPersonalStore object');
+          }
+          const message = CSOAccountItemPersonalStore.decode(objectData[0]).toJSON();
+          this.data.redeemableDrops = message.redeemableBalance ?? 0;
+          this.data.redeemableDropsGenerated = message.generationTime ?? null;
+          this.debug('got accountItemPersonalStore: ' + JSON.stringify(message));
           break;
         }
         case SubscribedCacheType.CEconGameAccountClient: {
@@ -358,11 +377,12 @@ export class Checker extends EventEmitter {
           this.data.prime ||= message.elevatedState === 5;
           this.data.bonusXpTimestampRefresh = message.bonusXpTimestampRefresh ?? null;
           this.data.bonusXpUsedflags = message.bonusXpUsedflags ?? 0;
-          this.acquiredData.gameAccountClient = true;
+          this.debug('got gameAccountClient: ' + JSON.stringify(message));
           break;
         }
       }
     }
+    this.acquiredData.caches = true;
   }
 
   processRankingInfo(info: PlayerRankingInfo) {
@@ -415,7 +435,18 @@ export class Checker extends EventEmitter {
         steamUser.logOff();
         reject(error);
       });
-      steamUser.on('loggedOn', () => this.log('Logged on'));
+      steamUser.on('loggedOn', () => {
+        this.log('Logged on');
+        steamUser.getPersonas([steamUser.steamID!]);
+      });
+      steamUser.on('user', (sid, user) => {
+        if (sid.toString() == steamUser.steamID?.toString()) {
+          this.data.personaName = user.player_name;
+          this.data.avatarUrl = user.avatar_url_full;
+          this.acquiredData.persona = true;
+          this.debug('got persona: ' + JSON.stringify(user));
+        }
+      });
       steamUser.on('licenses', (licenses) => this.log(`Got ${licenses.length} licenses`));
       steamUser.on('accountLimitations', (limited, communityBanned, locked) => {
         this.data.limited = limited;
@@ -468,6 +499,7 @@ export class Checker extends EventEmitter {
               this.processSubscribedCaches(caches);
               this.acquiredData.clientWelcome = true;
               this.log('got clientWelcome');
+              this.debug('got clientWelcome: ' + JSON.stringify(message));
               break;
             }
             case 9110: { // k_EMsgGCCStrike15_v2_MatchmakingGC2ClientHello
@@ -480,9 +512,10 @@ export class Checker extends EventEmitter {
                 this.data.penaltyExpires = null;
               }
               this.data.level = message.playerLevel ?? 0;
-              this.data.curXp = message.playerCurXp ?? 0;
+              this.data.curXp = (message.playerCurXp ?? 327680000) - 327680000;
               this.acquiredData.matchmakingClientHello = true;
               this.log('got matchmakingClientHello');
+              this.debug('got matchmakingClientHello: ' + JSON.stringify(message));
               break;
             }
             case 9194: { // k_EMsgGCCStrike15_v2_ClientGCRankUpdate
