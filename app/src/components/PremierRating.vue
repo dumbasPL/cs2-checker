@@ -1,25 +1,40 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import csRating0 from '../img/rating/cs_rating_0.svg';
+import csRating1 from '../img/rating/cs_rating_1.svg';
+import csRating2 from '../img/rating/cs_rating_2.svg';
+import csRating3 from '../img/rating/cs_rating_3.svg';
+import csRating4 from '../img/rating/cs_rating_4.svg';
+import csRating5 from '../img/rating/cs_rating_5.svg';
 
 const props = defineProps<{
-  rating: number;
+  rating: number
 }>();
 
 const ratingTier = computed(() => Math.min(6, Math.floor(props.rating / 5000)));
 const thousands = computed(() => Math.floor(props.rating / 1000));
 const remainder = computed(() => props.rating % 1000);
 
+const ratingImages = [
+  csRating0,
+  csRating1,
+  csRating2,
+  csRating3,
+  csRating4,
+  csRating5,
+];
+
 </script>
 
 <template>
   <div class="relative">
-    <img :src="`/img/cs_rating_${ratingTier}.svg`" :alt="`${thousands},${remainder}`" />
+    <img :src="ratingImages[ratingTier]" :alt="`${thousands},${remainder}`" />
     <div class="absolute inset-y-0 left-[11px] font-bold leading-tight text-center" :class="`cs-rating-tier-${ratingTier}`">
       <template v-if="thousands > 0">
         <span class="text-sm">{{ thousands }}</span>
         <span class="text-[0.7rem]">,{{ remainder }}</span>
       </template>
-      <span v-else class="text-sm">{{ props.rating }}</span>
+      <span v-else-if="rating > 0" class="text-sm">{{ props.rating }}</span>
     </div>
   </div>
 </template>
